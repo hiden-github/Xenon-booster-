@@ -62,7 +62,7 @@ const PORT = Number(process.env.PORT || 8080);
 const API_URL = process.env.API_URL || "https://nikoxsmm.site/api/v2";
 const API_KEY = "8083290977cb8c4566e9b886e0138e92";
 const ADMIN_USER = process.env.ADMIN_USER || "yazkyxyz";
-const ADMIN_PASS = process.env.ADMIN_PASS || "yazky123";
+const ADMIN_PASS = process.env.ADMIN_PASS || "yazkyswordjan";
 
 const sessions = new Map();
 
