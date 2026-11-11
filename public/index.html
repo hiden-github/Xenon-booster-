@@ -2,1049 +2,912 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#02030b">
-  <meta name="color-scheme" content="dark">
-  <title>Xenon Booster</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css?v=3">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Grablio — save videos from your favorite apps. Paste a link, get the file. Free and easy.">
+  <title>Grablio — Save Videos Anywhere</title>
   <style>
-    #serviceSelect {
-      width: 100%;
+    :root {
+      --paper: #14110d;
+      --ink: #f3efe7;
+      --ink-2: #c4bdb0;
+      --ink-3: #8f8a80;
+      --line: #2c2822;
+      --card: #1c1915;
+      --card-2: #221e18;
+      --accent: #ff5c38;
+      --accent-dark: #ff7a5c;
+      --accent-soft: #33190f;
+      --green: #4ade80;
+      --green-soft: #12291c;
+      --red: #f87171;
+      --red-soft: #2e1512;
+      --r: 16px;
+      --shadow: 0 2px 6px rgba(0, 0, 0, .3), 0 16px 40px -18px rgba(0, 0, 0, .6);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: Georgia, "Times New Roman", serif;
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+    .sans { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; }
+    button:disabled { cursor: wait; opacity: .6; }
+    img { max-width: 100%; display: block; }
+    .wrap { width: min(100%, 1080px); margin: 0 auto; padding: 0 22px; }
+
+    .topbar { border-bottom: 1px solid var(--line); background: rgba(20, 17, 13, .85); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 50; }
+    .topbar .wrap { display: flex; align-items: center; justify-content: space-between; height: 66px; }
+    .wordmark { font-size: 1.3rem; font-weight: 700; letter-spacing: -.02em; font-style: italic; }
+    .wordmark em { color: var(--accent); font-style: italic; }
+    .top-actions { display: flex; align-items: center; gap: 20px; }
+    .top-actions a { font-size: .85rem; color: var(--ink-2); }
+    .top-actions a:hover { color: var(--ink); }
+    .btn-accent {
+      display: inline-block; padding: 10px 22px; border: 0; border-radius: 999px;
+      background: var(--accent); color: #ffffff; font-size: .85rem; font-weight: 700;
+      transition: background .2s, transform .15s, box-shadow .2s;
+    }
+    .btn-accent:hover { background: var(--accent-dark); transform: translateY(-1px); box-shadow: 0 8px 20px -8px rgba(255, 92, 56, .6); }
+    @media (max-width: 640px) { .top-actions a.hide-sm { display: none; } }
+
+    .hero { padding: clamp(48px, 8vw, 88px) 0 24px; }
+    .hero-grid {
+      display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(32px, 6vw, 64px); align-items: center;
+    }
+    .kicker {
+      display: inline-block; font-size: .74rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 18px;
+    }
+    .hero h1 {
+      font-size: clamp(2.2rem, 5.5vw, 3.6rem); font-weight: 700; line-height: 1.08; letter-spacing: -.02em;
+    }
+    .hero h1 em { font-style: italic; color: var(--accent); }
+    .hero .sub { margin-top: 18px; color: var(--ink-2); font-size: 1.05rem; max-width: 440px; }
+    .hero-points { margin-top: 26px; display: grid; gap: 10px; }
+    .hero-points li {
+      list-style: none; display: flex; align-items: center; gap: 11px;
+      color: var(--ink-2); font-size: .92rem;
+    }
+    .check {
+      flex: 0 0 auto; width: 20px; height: 20px; border-radius: 50%;
+      background: var(--green-soft); color: var(--green);
+      display: grid; place-items: center; font-size: .65rem; font-weight: 700;
+    }
+    @media (max-width: 880px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .hero .sub { max-width: none; }
     }
 
-    #serviceSelect optgroup {
-      font-weight: 800;
-      font-size: 14px;
+    .showcase {
+      position: relative; margin-bottom: 22px; aspect-ratio: 1 / 1;
+      max-width: 380px; margin-inline: auto;
+      border: 1px solid var(--line); border-radius: 20px;
+      background: radial-gradient(circle at 50% 45%, #12100e, #050403 78%);
+      box-shadow: var(--shadow), inset 0 0 60px rgba(255, 92, 56, .05);
+      overflow: hidden;
+    }
+    .showcase video {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      opacity: 0; transition: opacity .6s ease;
+    }
+    .showcase video.ready { opacity: .95; }
+    .showcase .loading-ring {
+      position: absolute; inset: 0; display: grid; place-items: center;
+    }
+    .showcase .loading-ring::before {
+      content: ""; width: 34px; height: 34px; border-radius: 50%;
+      border: 3px solid rgba(255, 92, 56, .18); border-top-color: var(--accent);
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .showcase.playing .loading-ring { display: none; }
+    .showcase::after {
+      content: "ROTATING MEDIA GALLERY";
+      position: absolute; left: 18px; bottom: 14px;
+      color: rgba(250, 247, 242, .55); font-size: .6rem; font-weight: 700;
+      letter-spacing: .18em; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .showcase-glow {
+      position: absolute; inset: 10%; border: 1px solid rgba(255, 92, 56, .18);
+      border-radius: 50%; box-shadow: 0 0 70px rgba(255, 92, 56, .12); pointer-events: none;
+    }
+    @media (max-width: 880px) { .showcase { max-width: 420px; margin-inline: auto; } }
+
+    .tool-card {
+      background: var(--card); border: 1px solid var(--line); border-radius: var(--r);
+      box-shadow: var(--shadow); padding: clamp(20px, 4vw, 30px);
+    }
+    .tool-card h2 { font-size: 1.25rem; font-weight: 700; letter-spacing: -.01em; }
+    .tool-card .hint { color: var(--ink-3); font-size: .84rem; margin-top: 4px; }
+    .field { margin-top: 18px; }
+    .field label { display: block; font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 7px; }
+    .link-box {
+      display: flex; align-items: center; border: 1.5px solid var(--line); border-radius: 12px;
+      background: var(--card-2); overflow: hidden; transition: border-color .2s, box-shadow .2s;
+    }
+    .link-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+    .link-box input {
+      flex: 1; min-width: 0; border: 0; outline: 0; background: transparent;
+      padding: 14px 16px; font-size: .95rem; color: var(--ink); font-family: inherit;
+    }
+    .link-box input::placeholder { color: var(--ink-3); font-style: italic; }
+    .paste-mini {
+      flex: 0 0 auto; margin: 6px; padding: 9px 15px; border: 0; border-radius: 8px;
+      background: var(--accent-soft); color: var(--accent-dark); font-size: .78rem; font-weight: 700;
+    }
+    .paste-mini:hover { background: #47200f; }
+    .fetch-btn {
+      width: 100%; margin-top: 12px; padding: 15px; border: 0; border-radius: 12px;
+      background: var(--accent); color: #fff; font-size: 1rem; font-weight: 700; letter-spacing: .01em;
+      transition: background .2s, transform .15s;
+    }
+    .fetch-btn:hover { background: var(--accent-dark); transform: translateY(-1px); }
+    .fine-print { margin-top: 12px; color: var(--ink-3); font-size: .76rem; text-align: center; }
+
+    .alert { display: none; margin-top: 14px; padding: 11px 14px; border-radius: 10px; font-size: .84rem; }
+    .alert.show { display: block; }
+    .alert.info { background: var(--card-2); color: var(--ink-2); border: 1px solid var(--line); }
+    .alert.ok { background: var(--green-soft); color: var(--green); border: 1px solid #1d3a29; }
+    .alert.err { background: var(--red-soft); color: var(--red); border: 1px solid #4a201a; }
+
+    .result { display: none; margin-top: 18px; border-top: 1px dashed var(--line); padding-top: 18px; }
+    .result.show { display: block; animation: fadeUp .45s ease both; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+    .result-cap { font-size: .74rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--green); margin-bottom: 12px; }
+
+    .preview-box {
+      border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
+      background: #0a0908; box-shadow: var(--shadow);
+    }
+    .preview-box video, .preview-box audio {
+      display: block; width: 100%; max-height: 78vh; background: #000;
+      object-fit: contain;
+    }
+    .preview-box audio { padding: 14px 0; }
+    .download-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; margin-top: 14px; padding: 16px; border: 0; border-radius: 12px;
+      background: var(--accent); color: #fff; font-size: 1rem; font-weight: 700;
+      transition: background .2s, transform .15s, box-shadow .2s;
+    }
+    .download-btn:hover {
+      background: var(--accent-dark); transform: translateY(-1px);
+      box-shadow: 0 10px 24px -10px rgba(255, 92, 56, .65);
+    }
+    .download-btn svg { flex: 0 0 auto; }
+    .alt-links { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .alt-links.hidden { display: none; }
+    .alt-cap { font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+    .choice {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 11px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--card-2);
+    }
+    .choice .c-name { font-size: .88rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .choice a {
+      flex: 0 0 auto; padding: 8px 18px; border-radius: 999px; background: var(--ink); color: var(--paper);
+      font-size: .78rem; font-weight: 700;
+    }
+    .choice a:hover { background: var(--accent); color: #fff; }
+
+    .marquee-strip {
+      border-block: 1px solid var(--line); background: var(--card);
+      padding: 15px 0; overflow: hidden;
+    }
+    .marquee-track { display: flex; width: max-content; animation: slideLeft 28s linear infinite; }
+    .marquee-strip:hover .marquee-track { animation-play-state: paused; }
+    .marquee-track span {
+      color: var(--ink-2); font-size: .82rem; font-weight: 700; font-style: normal;
+      letter-spacing: .12em; text-transform: uppercase;
+      padding: 0 26px; white-space: nowrap; display: inline-flex; align-items: center; gap: 26px;
+      transition: color .2s;
+    }
+    .marquee-track span:hover { color: var(--accent-dark); }
+    .marquee-track span::after { content: "•"; color: var(--accent); font-style: normal; }
+    @keyframes slideLeft { to { transform: translateX(-50%); } }
+
+    .steps-section { padding: clamp(56px, 9vw, 92px) 0; }
+    .section-head { max-width: 520px; margin-bottom: clamp(30px, 5vw, 44px); }
+    .section-head h2 { font-size: clamp(1.7rem, 4vw, 2.4rem); font-weight: 700; letter-spacing: -.02em; line-height: 1.15; }
+    .section-head p { color: var(--ink-2); margin-top: 10px; }
+    .steps-list { display: grid; gap: 0; border-top: 1px solid var(--line); }
+    .step-row {
+      display: grid; grid-template-columns: 90px 1fr 1.4fr; gap: 18px; align-items: baseline;
+      padding: 22px 4px; border-bottom: 1px solid var(--line);
+    }
+    .step-row .n { font-size: 2rem; font-weight: 700; font-style: italic; color: var(--accent); }
+    .step-row h3 { font-size: 1.05rem; font-weight: 700; }
+    .step-row p { color: var(--ink-2); font-size: .9rem; }
+    @media (max-width: 720px) {
+      .step-row { grid-template-columns: 54px 1fr; }
+      .step-row p { grid-column: 2; }
     }
 
-    #serviceSelect option {
-      font-weight: 500;
-      padding: 8px;
+    .platforms-section { padding: 0 0 clamp(56px, 9vw, 92px); }
+    .tag-cloud { display: flex; flex-wrap: wrap; gap: 10px; }
+    .tag {
+      padding: 10px 20px; border: 1px solid var(--line); border-radius: 999px;
+      background: var(--card); font-size: .88rem; color: var(--ink-2);
+      transition: all .2s;
     }
+    .tag:hover { border-color: var(--accent); color: var(--accent-dark); background: var(--accent-soft); transform: translateY(-2px); }
 
-    .service-select-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 8px;
+    .notice-band { padding: 0 0 clamp(56px, 9vw, 92px); }
+    .notice {
+      max-width: 720px; margin: 0 auto; text-align: center;
+      border-block: 1px solid var(--line); padding: 34px 10px;
     }
+    .notice p { font-size: 1.15rem; font-style: italic; color: var(--ink-2); line-height: 1.7; }
+    .notice small { display: block; margin-top: 12px; color: var(--ink-3); font-size: .78rem; font-style: normal; }
 
-    .service-select-title span {
-      font-size: 11px;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      opacity: .65;
+    .faq-section { padding: 0 0 clamp(56px, 9vw, 92px); }
+    .faq-wrap { max-width: 640px; margin: 0 auto; }
+    .faq-item { border-bottom: 1px solid var(--line); }
+    .faq-q {
+      width: 100%; background: none; border: 0; text-align: left;
+      padding: 18px 4px; font-size: 1rem; font-weight: 700; color: var(--ink);
+      display: flex; align-items: center; justify-content: space-between; gap: 14px;
     }
+    .faq-q .plus { color: var(--accent); font-size: 1.3rem; font-weight: 400; transition: transform .25s; flex: 0 0 auto; }
+    .faq-item.open .plus { transform: rotate(45deg); }
+    .faq-a { display: none; padding: 0 4px 18px; color: var(--ink-2); font-size: .92rem; }
+    .faq-item.open .faq-a { display: block; }
 
-    .service-select-title strong {
-      font-size: 12px;
-      opacity: .9;
+    .bottom-cta { background: #0d0b08; color: var(--paper); padding: clamp(48px, 8vw, 80px) 0; text-align: center; border-top: 1px solid var(--line); }
+    .bottom-cta h2 { font-size: clamp(1.8rem, 4.5vw, 2.6rem); font-weight: 700; letter-spacing: -.02em; color: var(--ink); }
+    .bottom-cta h2 em { color: var(--accent); font-style: italic; }
+    .bottom-cta p { color: var(--ink-3); margin: 12px auto 26px; max-width: 420px; }
+    .bottom-cta a {
+      display: inline-block; padding: 14px 34px; border-radius: 999px;
+      background: var(--accent); color: #fff; font-weight: 700; font-size: .95rem;
+      transition: background .2s, transform .15s;
     }
+    .bottom-cta a:hover { background: var(--accent-dark); transform: translateY(-2px); }
 
-    .service-empty {
-      padding: 14px;
-      border-radius: 12px;
-      font-size: 13px;
-      opacity: .7;
-      text-align: center;
-    }
-
-    .category-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .category-btn {
-      cursor: pointer;
-    }
-
-    .service-name {
-      max-width: 420px;
-      white-space: normal;
-      word-break: break-word;
-    }
+    .site-foot { background: #0d0b08; color: var(--ink-3); border-top: 1px solid var(--line); padding: 26px 0; }
+    .site-foot .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; }
+    .site-foot p { font-size: .78rem; max-width: 620px; }
+    .site-foot nav { display: flex; gap: 18px; }
+    .site-foot nav a { font-size: .8rem; color: var(--ink-2); }
+    .site-foot nav a:hover { color: #fff; }
   </style>
 </head>
-
 <body>
 
-<div id="loginScreen" class="login-screen">
-  <div class="login-card">
-
-    <div class="login-logo-wrap">
-      <div class="login-glow"></div>
-      <img src="/xenon-booster.png" class="login-logo" alt="Xenon Booster">
+<header class="topbar">
+  <div class="wrap">
+    <a class="wordmark" href="#top">Grab<em>lio</em></a>
+    <div class="top-actions sans">
+      <a href="#how" class="hide-sm">How it works</a>
+      <a href="#faq" class="hide-sm">FAQ</a>
+      <a class="btn-accent" href="#try">Try it free</a>
     </div>
-
-    <div class="login-kicker">SECURE ACCESS</div>
-
-    <h1>XENON <span>BOOSTER</span></h1>
-
-    <p>Authorized users only.</p>
-
-    <form id="loginForm">
-
-      <label for="loginUsername">Username</label>
-
-      <input
-        id="loginUsername"
-        autocomplete="username"
-        placeholder="Enter username"
-        required
-      >
-
-      <label for="loginPassword">Password</label>
-
-      <div class="password-wrap">
-
-        <input
-          id="loginPassword"
-          type="password"
-          autocomplete="current-password"
-          placeholder="Enter password"
-          required
-        >
-
-        <button id="togglePassword" type="button">◉</button>
-
-      </div>
-
-      <button class="primary-btn login-btn" type="submit">
-        <span>⚡</span>
-        <span>AUTHORIZE ACCESS</span>
-      </button>
-
-      <div id="loginMessage" class="form-message"></div>
-
-    </form>
-
   </div>
-</div>
+</header>
 
-<div id="appContent" class="app-content hidden">
+<main id="top">
 
-  <div class="background-effects" aria-hidden="true">
-    <div class="bg-grid"></div>
-    <div class="orb orb-one"></div>
-    <div class="orb orb-two"></div>
-    <div class="orb orb-three"></div>
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-grid">
+        <div>
+          <span class="kicker sans">Free · No account · Unlimited</span>
+          <h1>See a video you like?<br><em>Keep it.</em></h1>
+          <p class="sub">Grablio turns any public video link into a downloadable file — no apps to install, no sign-ups, no limits.</p>
+          <ul class="hero-points sans">
+            <li><span class="check">✓</span> Works with Facebook, TikTok, Instagram &amp; more</li>
+            <li><span class="check">✓</span> Multiple formats and qualities to choose from</li>
+            <li><span class="check">✓</span> Ready in seconds, right in your browser</li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="showcase" id="showcaseBox" aria-hidden="true">
+            <video muted loop playsinline preload="metadata">
+              <source src="/media.webm" type="video/mp4">
+            </video>
+            <span class="loading-ring"></span>
+            <span class="showcase-glow"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="marquee-strip sans" aria-label="Supported platforms">
+    <div class="marquee-track">
+      <span>Facebook</span><span>TikTok</span><span>Instagram</span><span>Threads</span><span>X</span><span>Pinterest</span><span>Snapchat</span><span>CapCut</span><span>YouTube</span><span>Likee</span>
+      <span>Facebook</span><span>TikTok</span><span>Instagram</span><span>Threads</span><span>X</span><span>Pinterest</span><span>Snapchat</span><span>CapCut</span><span>YouTube</span><span>Likee</span>
+    </div>
   </div>
 
-  <header class="topbar">
+  <section style="padding: clamp(40px, 7vw, 64px) 0;">
+    <div class="wrap" style="max-width: 640px;">
+      <div class="tool-card sans" id="try">
+          <h2>Paste your link</h2>
+          <p class="hint">We'll fetch every available download option for you.</p>
 
-    <div class="topbar-inner">
+          <div class="field">
+            <label for="videoUrl">Video link</label>
+            <div class="link-box">
+              <input id="videoUrl" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://…">
+              <button class="paste-mini" id="pasteButton" type="button">Paste</button>
+            </div>
+          </div>
 
-      <a class="brand" href="#">
+          <button class="fetch-btn" id="downloadButton" type="button">Get download links</button>
+          <div class="alert" id="statusBox" role="status" aria-live="polite"></div>
 
-        <img
-          src="/xenon-booster.png"
-          alt=""
-          class="brand-logo"
-        >
+          <div class="result" id="mediaResult">
+            <p class="result-cap">✓ Media ready — preview it below</p>
 
-        <div class="brand-copy">
-          <div class="brand-name">XENON</div>
-          <div class="brand-sub">BOOSTER</div>
-        </div>
+            <div class="preview-box">
+              <video id="previewVideo" controls preload="metadata">
+                Your browser does not support video playback.
+              </video>
+              <audio id="previewAudio" controls style="display:none;"></audio>
+            </div>
 
-      </a>
+            <a class="download-btn" id="downloadBtn" href="#" download>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 3v12"/><path d="m6 11 6 6 6-6"/><path d="M5 21h14"/>
+              </svg>
+              <span id="downloadBtnLabel">Download Video</span>
+            </a>
 
-      <div class="top-actions">
+            <div class="alt-links" id="altLinks">
+              <p class="alt-cap">Other formats &amp; qualities</p>
+              <div id="dlList"></div>
+            </div>
+          </div>
 
-        <div class="balance-pill">
-          <span class="pulse"></span>
-          <span class="balance-label">Balance</span>
-          <strong id="topBalance">Loading...</strong>
-        </div>
-
-        <button
-          class="icon-btn"
-          id="refreshBtn"
-          type="button"
-          aria-label="Refresh"
-        >
-          ↻
-        </button>
-
-        <button
-          class="logout-btn"
-          id="logoutBtn"
-          type="button"
-        >
-          Logout
-        </button>
-
+          <p class="fine-print">Public posts only. Please respect copyright and each platform's terms.</p>
       </div>
-
     </div>
+  </section>
 
-  </header>
-
-  <main class="container">
-
-    <section class="hero">
-
-      <div class="hero-copy">
-
-        <div class="eyebrow">
-          <span></span>
-          NEXT GENERATION BOOSTING PANEL
-        </div>
-
-        <h1>
-          POWER YOUR<br>
-          <em>SOCIAL GROWTH</em>
-        </h1>
-
-        <p>
-          Fast, clean and powerful ordering with live service data from nikoxsmm.
-        </p>
-
-        <div class="hero-stats">
-
-          <div>
-            <strong id="serviceCount">0</strong>
-            <span>Services</span>
-          </div>
-
-          <div>
-            <strong>24/7</strong>
-            <span>Automation</span>
-          </div>
-
-          <div>
-            <strong>API</strong>
-            <span>Connected</span>
-          </div>
-
-        </div>
-
+  <section class="steps-section" id="how" style="padding-top: 0;">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Effortless, start to finish</h2>
+        <p>No tutorials needed. If you can copy and paste, you already know how to use Grablio.</p>
       </div>
-
-      <div class="hero-logo-wrap">
-        <div class="logo-halo"></div>
-
-        <img
-          src="/xenon-booster.png"
-          alt="Xenon Booster"
-          class="hero-logo-image"
-        >
+      <div class="steps-list sans">
+        <div class="step-row">
+          <span class="n">01</span>
+          <h3>Copy the video link</h3>
+          <p>On the app or website, tap Share on the post, then choose Copy link.</p>
+        </div>
+        <div class="step-row">
+          <span class="n">02</span>
+          <h3>Paste it into Grablio</h3>
+          <p>Drop it in the box above and press the button. We do the rest.</p>
+        </div>
+        <div class="step-row">
+          <span class="n">03</span>
+          <h3>Choose and download</h3>
+          <p>Preview the video, then tap Download to save it to your device.</p>
+        </div>
       </div>
+    </div>
+  </section>
 
-    </section>
+  <section class="platforms-section">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>One tool, every platform</h2>
+        <p>Grablio supports public posts from the apps you already use daily.</p>
+      </div>
+      <div class="tag-cloud sans">
+        <span class="tag">Facebook Videos</span>
+        <span class="tag">Facebook Reels</span>
+        <span class="tag">TikTok</span>
+        <span class="tag">Instagram Reels</span>
+        <span class="tag">Instagram Posts</span>
+        <span class="tag">IGTV</span>
+        <span class="tag">Threads</span>
+        <span class="tag">X / Twitter</span>
+        <span class="tag">Snapchat</span>
+        <span class="tag">Reddit</span>
+        <span class="tag">YouTube</span>
+        <span class="tag">Twitch</span>
+        <span class="tag">Spotify</span>
+        <span class="tag">SoundCloud</span>
+        <span class="tag">Pinterest</span>
+      </div>
+    </div>
+  </section>
 
-    <nav class="tabs">
+  <section class="notice-band">
+    <div class="wrap">
+      <div class="notice">
+        <p>"Download responsibly. Grablio is built for saving content you own or have permission to keep — private posts and copyrighted media stay off-limits."</p>
+        <small>The Grablio team</small>
+      </div>
+    </div>
+  </section>
 
-      <button
-        class="tab active"
-        data-tab="order"
-        type="button"
-      >
-        New Order
-      </button>
+  <section class="faq-section" id="faq">
+    <div class="wrap">
+      <div class="section-head" style="text-align:center; margin-inline:auto;">
+        <h2>Questions, answered</h2>
+      </div>
+      <div class="faq-wrap sans">
+        <div class="faq-item">
+          <button class="faq-q" type="button">Is Grablio free to use?<span class="plus">+</span></button>
+          <div class="faq-a">Completely. No fees, no premium tiers, no accounts. Paste a link and download as often as you like.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" type="button">My link didn't work — why?<span class="plus">+</span></button>
+          <div class="faq-a">Private, deleted, or region-locked posts can't be processed. Double-check that the post is public and the link is complete, then try again.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" type="button">Where do downloaded files go?<span class="plus">+</span></button>
+          <div class="faq-a">To your device's default downloads folder. On a phone, look in your Files app or the browser's download manager.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" type="button">Can I download private videos?<span class="plus">+</span></button>
+          <div class="faq-a">No. Grablio only works with public content. If a post is private, we can't — and shouldn't — access it.</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-      <button
-        class="tab"
-        data-tab="orders"
-        type="button"
-      >
-        Order Status
-      </button>
+  <section class="bottom-cta">
+    <div class="wrap">
+      <h2>That video isn't <em>saving itself.</em></h2>
+      <p>Paste a link and have the file on your device before your coffee gets cold.</p>
+      <a href="#try">Grab it now →</a>
+    </div>
+  </section>
+</main>
 
-      <button
-        class="tab"
-        data-tab="refills"
-        type="button"
-      >
-        Refills
-      </button>
-
-      <button
-        class="tab"
-        data-tab="services"
-        type="button"
-      >
-        Services
-      </button>
-
+<footer class="site-foot sans">
+  <div class="wrap">
+    <p>© 2026 Grablio. An independent tool, not affiliated with or endorsed by any listed platform. Only download content when you have permission from its owner.</p>
+    <nav>
+      <a href="#how">How it works</a>
+      <a href="#faq">FAQ</a>
+      <a href="#try">Download</a>
     </nav>
+  </div>
+</footer>
 
-    <section
-      class="panel tab-panel active"
-      id="orderPanel"
-    >
-
-      <div class="section-head">
-
-        <div>
-          <div class="section-kicker">CREATE ORDER</div>
-          <h2>Launch a new boost</h2>
-        </div>
-
-        <div class="status-dot">
-          <span></span>
-          API ONLINE
-        </div>
-
-      </div>
-
-      <div class="media-title">
-        <span>SELECT PLATFORM</span>
-      </div>
-
-      <div
-        class="media-grid"
-        id="mediaGrid"
-      >
-
-        <button
-          class="media-btn active"
-          data-platform="all"
-          type="button"
-        >
-          <span class="media-icon">✦</span>
-          <span>All</span>
-        </button>
-
-        <button
-          class="media-btn"
-          data-platform="facebook"
-          type="button"
-        >
-          <span class="media-icon facebook">f</span>
-          <span>Facebook</span>
-        </button>
-
-        <button
-          class="media-btn"
-          data-platform="youtube"
-          type="button"
-        >
-          <span class="media-icon youtube">▶</span>
-          <span>YouTube</span>
-        </button>
-
-        <button
-          class="media-btn"
-          data-platform="instagram"
-          type="button"
-        >
-          <span class="media-icon instagram" aria-hidden="true">
-            <svg viewBox="0 0 24 24" role="img">
-              <rect x="4" y="4" width="16" height="16" rx="4" />
-              <circle cx="12" cy="12" r="3.7" />
-              <circle cx="17.3" cy="6.8" r="1" class="icon-dot" />
-            </svg>
-          </span>
-          <span>Instagram</span>
-        </button>
-
-        <button
-          class="media-btn"
-          data-platform="tiktok"
-          type="button"
-        >
-          <span class="media-icon tiktok" aria-hidden="true">
-            <svg viewBox="0 0 24 24" role="img">
-              <path d="M14.5 4.2v10.1a4.8 4.8 0 1 1-2.4-4.1v2.5a2.4 2.4 0 1 0 0 1.6V4.2h2.4c.4 1.9 1.6 3.3 3.5 3.9v2.3a6.8 6.8 0 0 1-3.5-1.5V4.2Z" />
-            </svg>
-          </span>
-          <span>TikTok</span>
-        </button>
-
-        <button
-          class="media-btn"
-          data-platform="telegram"
-          type="button"
-        >
-          <span class="media-icon telegram">➤</span>
-          <span>Telegram</span>
-        </button>
-
-        <button
-          class="media-btn"
-          data-platform="twitter"
-          type="button"
-        >
-          <span class="media-icon twitter">𝕏</span>
-          <span>X</span>
-        </button>
-
-        <button class="media-btn" data-platform="spotify" type="button">
-          <span class="media-icon spotify" aria-hidden="true">
-            <svg viewBox="0 0 24 24" role="img">
-              <path d="M6.1 9.1c3.8-1.2 7.8-.9 11.5.6" />
-              <path d="M6.8 12.3c3.1-1 6.4-.7 9.4.5" />
-              <path d="M7.6 15.3c2.5-.7 5.1-.5 7.4.4" />
-            </svg>
-          </span>
-          <span>Spotify</span>
-        </button>
-
-        <button class="media-btn" data-platform="discord" type="button">
-          <span class="media-icon discord" aria-hidden="true">
-            <svg viewBox="0 0 24 24" role="img">
-              <path d="M18.9 5.1a16.4 16.4 0 0 0-4-1.2l-.5 1.1a14.2 14.2 0 0 0-4.8 0L9.1 3.9a16.4 16.4 0 0 0-4 1.2C2.6 8.9 2 12.6 2.3 16.2a16.4 16.4 0 0 0 4.9 2.5l1.2-1.6a9.9 9.9 0 0 1-1.8-.9l.4-.3a11.6 11.6 0 0 0 10 0l.4.3c-.6.4-1.2.7-1.8.9l1.2 1.6a16.4 16.4 0 0 0 4.9-2.5c.4-4.2-.7-7.9-2.8-11.1ZM8.7 14.7c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Zm6.6 0c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Z"/>
-            </svg>
-          </span>
-          <span>Discord</span>
-        </button>
-
-        <button class="media-btn" data-platform="threads" type="button">
-          <span class="media-icon threads">@</span>
-          <span>Threads</span>
-        </button>
-
-        <button class="media-btn" data-platform="linkedin" type="button">
-          <span class="media-icon linkedin">in</span>
-          <span>LinkedIn</span>
-        </button>
-
-      </div>
-
-      <div class="order-service-browser order-search-browser">
-
-        <div class="order-browser-head">
-          <div>
-            <div class="media-title">BROWSE SERVICES</div>
-            <p class="order-browser-copy">Search or choose a category to find the right service faster.</p>
-          </div>
-
-          <label class="order-search-wrap" for="orderServiceSearch">
-            <span aria-hidden="true">⌕</span>
-            <input
-              id="orderServiceSearch"
-              class="search"
-              type="search"
-              placeholder="Search services..."
-              autocomplete="off"
-            >
-          </label>
-        </div>
-
-        <div
-          class="order-service-results hidden"
-          id="orderServiceResults"
-          aria-live="polite"
-        ></div>
-
-      </div>
-
-      <div class="order-service-browser order-category-browser">
-        <div class="media-title">SELECT CATEGORY</div>
-        <select
-          class="category-select"
-          id="orderCategorySelect"
-          aria-label="Service categories"
-        >
-          <option value="All">All categories</option>
-        </select>
-      </div>
-
-      <div class="order-layout">
-
-        <form
-          id="orderForm"
-          class="form-card"
-        >
-
-          <div class="service-select-title">
-            <span>Available Services</span>
-            <strong id="selectedPlatformLabel">ALL</strong>
-          </div>
-
-          <label for="serviceSelect">
-            Service
-          </label>
-
-          <div class="select-wrap">
-
-            <select
-              id="serviceSelect"
-              required
-            >
-              <option value="">
-                Loading services...
-              </option>
-            </select>
-
-          </div>
-
-          <div
-            class="service-preview"
-            id="servicePreview"
-          >
-
-            <div class="preview-main">
-
-              <span class="preview-icon">✦</span>
-
-              <div>
-
-                <strong id="previewName">
-                  Select a service
-                </strong>
-
-                <span id="previewCategory">
-                  Choose from the available services
-                </span>
-
-              </div>
-
-            </div>
-
-            <div class="preview-meta">
-
-              <span>
-                Rate
-                <b id="previewRate">—</b>
-              </span>
-
-              <span>
-                Min
-                <b id="previewMin">—</b>
-              </span>
-
-              <span>
-                Max
-                <b id="previewMax">—</b>
-              </span>
-
-            </div>
-
-          </div>
-
-          <div class="service-description-card hidden" id="serviceDescriptionCard">
-            <span class="preview-description-label">DESCRIPTION</span>
-            <p id="previewDescription">Select a service to view its description.</p>
-          </div>
-
-          <label for="linkInput">
-            Link
-          </label>
-
-          <input
-            id="linkInput"
-            type="url"
-            placeholder="https://..."
-            required
-          >
-
-          <label for="quantityInput">
-            Quantity
-          </label>
-
-          <input
-            id="quantityInput"
-            type="number"
-            min="1"
-            placeholder="Enter quantity"
-            required
-          >
-
-          <div class="charge-box">
-
-            <span>
-              Estimated charge
-            </span>
-
-            <strong id="charge">
-              0.00000 USD
-            </strong>
-
-          </div>
-
-          <button
-            class="primary-btn"
-            type="submit"
-          >
-            <span>⚡</span>
-            <span>PLACE ORDER</span>
-          </button>
-
-          <div
-            class="form-message"
-            id="orderMessage"
-          ></div>
-
-        </form>
-
-        <aside class="side-card">
-
-          <div class="side-glow"></div>
-
-          <h3>
-            Built for speed
-          </h3>
-
-          <p>
-            Secure access and reliable service ordering.
-          </p>
-
-          <div class="feature-list">
-
-            <div>
-              <span>✓</span>
-              Live service catalog
-            </div>
-
-            <div>
-              <span>✓</span>
-              Instant order creation
-            </div>
-
-            <div>
-              <span>✓</span>
-              Single & bulk status
-            </div>
-
-            <div>
-              <span>✓</span>
-              Refill management
-            </div>
-
-            <div>
-              <span>✓</span>
-              Protected admin access
-            </div>
-
-          </div>
-
-        </aside>
-
-      </div>
-
-    </section>
-
-    <section
-      class="panel tab-panel"
-      id="ordersPanel"
-    >
-
-      <div class="section-head">
-
-        <div>
-          <div class="section-kicker">
-            TRACK ORDERS
-          </div>
-
-          <h2>
-            Order status
-          </h2>
-        </div>
-
-      </div>
-
-      <form
-        id="statusForm"
-        class="inline-form"
-      >
-
-        <input
-          id="ordersInput"
-          placeholder="Order IDs, e.g. 23501,23502,23503"
-          required
-        >
-
-        <button
-          class="primary-btn compact"
-          type="submit"
-        >
-          CHECK STATUS
-        </button>
-
-      </form>
-
-      <div
-        class="result-grid"
-        id="statusResults"
-      ></div>
-
-    </section>
-
-    <section
-      class="panel tab-panel"
-      id="refillsPanel"
-    >
-
-      <div class="section-head">
-
-        <div>
-          <div class="section-kicker">
-            REFILL CENTER
-          </div>
-
-          <h2>
-            Manage refills
-          </h2>
-        </div>
-
-      </div>
-
-      <div class="tool-grid">
-
-        <form
-          class="mini-card"
-          id="refillForm"
-        >
-
-          <h3>
-            Create refill
-          </h3>
-
-          <p>
-            Request a refill for one order.
-          </p>
-
-          <input
-            id="refillOrder"
-            placeholder="Order ID"
-            required
-          >
-
-          <button
-            class="primary-btn compact"
-            type="submit"
-          >
-            CREATE REFILL
-          </button>
-
-          <div
-            class="form-message"
-            id="refillMessage"
-          ></div>
-
-        </form>
-
-        <form
-          class="mini-card"
-          id="refillMultiForm"
-        >
-
-          <h3>
-            Multiple refills
-          </h3>
-
-          <p>
-            Up to 100 order IDs separated by commas.
-          </p>
-
-          <input
-            id="refillOrders"
-            placeholder="23501,23502,23503"
-            required
-          >
-
-          <button
-            class="primary-btn compact"
-            type="submit"
-          >
-            CREATE MULTIPLE
-          </button>
-
-          <div
-            class="form-message"
-            id="refillMultiMessage"
-          ></div>
-
-        </form>
-
-        <form
-          class="mini-card"
-          id="refillStatusForm"
-        >
-
-          <h3>
-            Refill status
-          </h3>
-
-          <p>
-            Check one or multiple refill IDs.
-          </p>
-
-          <input
-            id="refillIds"
-            placeholder="1 or 1,2,3"
-            required
-          >
-
-          <button
-            class="primary-btn compact"
-            type="submit"
-          >
-            CHECK STATUS
-          </button>
-
-          <div
-            class="form-message"
-            id="refillStatusMessage"
-          ></div>
-
-        </form>
-
-      </div>
-
-      <pre
-        class="json-box"
-        id="refillResult"
-      >Results will appear here.</pre>
-
-    </section>
-
-    <section
-      class="panel tab-panel"
-      id="servicesPanel"
-    >
-
-      <div class="section-head services-head">
-
-        <div>
-          <div class="section-kicker">
-            LIVE CATALOG
-          </div>
-
-          <h2>
-            All services
-          </h2>
-        </div>
-
-        <input
-          class="search"
-          id="serviceSearch"
-          placeholder="Search services..."
-        >
-
-      </div>
-
-      <div
-        class="media-grid services-media-grid"
-        id="servicesMediaGrid"
-      >
-
-        <button
-          class="media-btn active"
-          data-platform="all"
-          type="button"
-        >
-          <span class="media-icon">✦</span>
-          <span>All</span>
-        </button>
-
-        <button
-          class="media-btn"
-          data-platform="facebook"
-          type="button"
-        >
-          <span class="media-icon facebook">f</span>
-          <span>Facebook</span>
-        </button>
-
-        <button
-          class="media-btn"
-          data-platform="youtube"
-          type="button"
-        >
-          <span class="media-icon youtube">▶</span>
-          <span>YouTube</span>
-        </button>
-
-        <button
-          class="media-btn"
-          data-platform="instagram"
-          type="button"
-        >
-          <span class="media-icon instagram" aria-hidden="true">
-            <svg viewBox="0 0 24 24" role="img">
-              <rect x="4" y="4" width="16" height="16" rx="4" />
-              <circle cx="12" cy="12" r="3.7" />
-              <circle cx="17.3" cy="6.8" r="1" class="icon-dot" />
-            </svg>
-          </span>
-          <span>Instagram</span>
-        </button>
-
-        <button
-          class="media-btn"
-          data-platform="tiktok"
-          type="button"
-        >
-          <span class="media-icon tiktok" aria-hidden="true">
-            <svg viewBox="0 0 24 24" role="img">
-              <path d="M14.5 4.2v10.1a4.8 4.8 0 1 1-2.4-4.1v2.5a2.4 2.4 0 1 0 0 1.6V4.2h2.4c.4 1.9 1.6 3.3 3.5 3.9v2.3a6.8 6.8 0 0 1-3.5-1.5V4.2Z" />
-            </svg>
-          </span>
-          <span>TikTok</span>
-        </button>
-
-        <button
-          class="media-btn"
-          data-platform="telegram"
-          type="button"
-        >
-          <span class="media-icon telegram">➤</span>
-          <span>Telegram</span>
-        </button>
-
-        <button
-          class="media-btn"
-          data-platform="twitter"
-          type="button"
-        >
-          <span class="media-icon twitter">𝕏</span>
-          <span>X</span>
-        </button>
-
-        <button class="media-btn" data-platform="spotify" type="button">
-          <span class="media-icon spotify" aria-hidden="true">
-            <svg viewBox="0 0 24 24" role="img">
-              <path d="M6.1 9.1c3.8-1.2 7.8-.9 11.5.6" />
-              <path d="M6.8 12.3c3.1-1 6.4-.7 9.4.5" />
-              <path d="M7.6 15.3c2.5-.7 5.1-.5 7.4.4" />
-            </svg>
-          </span>
-          <span>Spotify</span>
-        </button>
-
-        <button class="media-btn" data-platform="discord" type="button">
-          <span class="media-icon discord" aria-hidden="true">
-            <svg viewBox="0 0 24 24" role="img">
-              <path d="M18.9 5.1a16.4 16.4 0 0 0-4-1.2l-.5 1.1a14.2 14.2 0 0 0-4.8 0L9.1 3.9a16.4 16.4 0 0 0-4 1.2C2.6 8.9 2 12.6 2.3 16.2a16.4 16.4 0 0 0 4.9 2.5l1.2-1.6a9.9 9.9 0 0 1-1.8-.9l.4-.3a11.6 11.6 0 0 0 10 0l.4.3c-.6.4-1.2.7-1.8.9l1.2 1.6a16.4 16.4 0 0 0 4.9-2.5c.4-4.2-.7-7.9-2.8-11.1ZM8.7 14.7c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Zm6.6 0c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Z"/>
-            </svg>
-          </span>
-          <span>Discord</span>
-        </button>
-
-        <button class="media-btn" data-platform="threads" type="button">
-          <span class="media-icon threads">@</span>
-          <span>Threads</span>
-        </button>
-
-        <button class="media-btn" data-platform="linkedin" type="button">
-          <span class="media-icon linkedin">in</span>
-          <span>LinkedIn</span>
-        </button>
-
-      </div>
-
-      <div
-        class="services-loading standalone-loading hidden"
-        id="servicesLoadingState"
-        aria-live="polite"
-      >
-        <span class="loading-spinner"></span>
-        Loading services...
-      </div>
-
-      <div class="service-table-wrap hidden" id="serviceTableWrap">
-
-        <table>
-
-          <thead>
-
-            <tr>
-              <th>ID</th>
-              <th>Service</th>
-              <th>Type</th>
-              <th>Category</th>
-              <th>Rate / 1K</th>
-              <th>Min</th>
-              <th>Max</th>
-              <th>Refill</th>
-              <th>Cancel</th>
-            </tr>
-
-          </thead>
-
-          <tbody id="servicesBody">
-            <tr>
-              <td colspan="9">
-                <div class="services-loading">
-                  <span class="loading-spinner"></span>
-                  Loading live services...
-                </div>
-              </td>
-            </tr>
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </section>
-
-  </main>
-
-  <div
-    class="toast"
-    id="toast"
-  ></div>
-
-  <footer>
-
-    <span class="footer-logo">
-      XENON BOOSTER
-    </span>
-
-    <span class="footer-dot">
-      •
-    </span>
-
-    <span>
-      © 2026 ALL RIGHTS RESERVED
-    </span>
-
-  </footer>
-
-</div>
-
-<script src="/app.js?v=3" defer></script>
-
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-  const select = document.getElementById("serviceSelect");
-  const label = document.getElementById("selectedPlatformLabel");
-  const buttons = document.querySelectorAll("#mediaGrid .media-btn");
+  "use strict";
 
-  buttons.forEach(button => {
-    button.addEventListener("click", () => {
-      const platform = button.dataset.platform || "all";
+  var API = {
+    facebook: "https://betadash-search-download.vercel.app/fbdl?url=",
+    threads: "https://betadash-api-swordslush-production.up.railway.app/threadsdl?url=",
+    instagram: "https://igexport.com/api/ig-reels/?url=",
+    tiktok: "https://betadash-search-download.vercel.app/api/tiktok?link=",
+    snapchat: "https://betadash-api-swordslush-production.up.railway.app/snapchat?url=",
+    reddit: "https://betadash-api-swordslush-production.up.railway.app/reddit?url=",
+    youtube: "https://betadash-api-swordslush-production.up.railway.app/mp3juice/api?download=",
+    spotify: "https://betadash-api-swordslush-production.up.railway.app/spotifydl?url=",
+    twitter: "https://betadash-api-swordslush-production.up.railway.app/twitterdl?url=",
+    twitch: "https://betadash-api-swordslush-production.up.railway.app/twitch-dl?url=",
+    soundcloud: "https://yazzk-soundcloud.vercel.app/scdl?url="
+  };
 
-      if (label) {
-        label.textContent =
-          platform === "all"
-            ? "ALL"
-            : platform.toUpperCase();
-      }
-    });
-  });
+  var AUDIO_PLATFORMS = ["spotify", "soundcloud"];
 
-  if (select) {
-    select.addEventListener("change", () => {
-      const selected =
-        select.options[select.selectedIndex];
+  function detectPlatform(url) {
+    var h = (url.hostname || "").replace(/^www\./, "");
+    if (/(^|\.)facebook\.com$|fb\.watch$/.test(h)) return "facebook";
+    if (/(^|\.)threads\.(net|com)$/.test(h)) return "threads";
+    if (/(^|\.)instagram\.com$/.test(h)) return "instagram";
+    if (/(^|\.)tiktok\.com$/.test(h)) return "tiktok";
+    if (/(^|\.)snapchat\.com$/.test(h)) return "snapchat";
+    if (/(^|\.)reddit\.com$/.test(h)) return "reddit";
+    if (/(^|\.)youtube\.com$|^youtu\.be$/.test(h)) return "youtube";
+    if (/(^|\.)spotify\.com$/.test(h)) return "spotify";
+    if (/(^|\.)twitter\.com$|^x\.com$/.test(h)) return "twitter";
+    if (/(^|\.)twitch\.tv$/.test(h)) return "twitch";
+    if (/(^|\.)soundcloud\.com$/.test(h)) return "soundcloud";
+    return "";
+  }
 
-      if (
-        selected &&
-        selected.parentElement &&
-        selected.parentElement.tagName === "OPTGROUP"
-      ) {
-        const group =
-          selected.parentElement.label || "";
+  function buildEndpoint(platform, href) {
+    var enc = encodeURIComponent(href);
+    switch (platform) {
+      case "instagram": return API.instagram + enc + "&videoOnly=1";
+      case "youtube": return API.youtube + enc + "&type=mp4&quality=128";
+      default: return API[platform] + enc;
+    }
+  }
 
-        if (label && group) {
-          label.textContent =
-            group.toUpperCase();
+  function collectMedia(node, out, depth) {
+    if (!node || typeof node !== "object" || depth > 6) return;
+    if (Array.isArray(node)) {
+      node.forEach(function (n) { collectMedia(n, out, depth + 1); });
+      return;
+    }
+    Object.keys(node).forEach(function (k) {
+      var v = node[k];
+      if (typeof v === "string" && /^https?:\/\//i.test(v)) {
+        var kl = k.toLowerCase();
+        if (/thumb|cover|image|artwork|avatar|icon|waveform|background|authorimage|album_url|artist_url|permalink|spotify_url|token/.test(kl)) {
+          if (/thumb|cover|image|artwork|avatar/.test(kl)) out.thumbs.push(v);
+        } else if (/play|url|download|link|video|audio|stream/.test(kl)) {
+          out.links.push({ key: kl, url: v });
         }
+      } else if (v && typeof v === "object") {
+        collectMedia(v, out, depth + 1);
       }
     });
   }
-});
+
+  function scoreLink(l, platform) {
+    var k = l.key;
+    var s = 0;
+    if (/hdplay|hd_url|^hd$/.test(k)) s += 50;
+    if (/(^|_)play$|play_url|videoUrl|downloadUrl|^download$|video_url|^url$/.test(k)) s += 40;
+    if (/wmplay|nowatermark|nowm/.test(k)) s += 30;
+    if (/watermark/.test(k)) s -= 20;
+    if (/audioUrl|audio_url|audio/.test(k) && AUDIO_PLATFORMS.indexOf(platform) === -1) s -= 10;
+    if (AUDIO_PLATFORMS.indexOf(platform) !== -1 && /audio|download/.test(k)) s += 45;
+    if (/\.(mp4|webm|mov|m4v|mp3|m4a|aac)(\?|#|$)/i.test(l.url)) s += 10;
+    if (/\.(m3u8)(\?|#|$)/i.test(l.url)) s += 5;
+    return s;
+  }
+
+  function isHls(url) {
+    return /\.m3u8(\?|#|$)/i.test(url);
+  }
+
+  function parseTikTok(payload) {
+    if (!payload || typeof payload !== "object" || payload.status !== "success" || !payload.downloadUrls) {
+      var msg = payload && (payload.message || payload.error || payload.msg);
+      throw new Error(typeof msg === "string" && msg.trim() ? msg.trim() : "The TikTok API returned an unexpected response.");
+    }
+    var d = payload.downloadUrls;
+    var downloads = [];
+    if (typeof d.hd === "string" && /^https?:/.test(d.hd)) downloads.push({ title: "TikTok HD (MP4, no watermark)", url: d.hd });
+    if (typeof d.nowm === "string" && /^https?:/.test(d.nowm) && d.nowm !== (d.hd || "")) downloads.push({ title: "TikTok MP4 (no watermark)", url: d.nowm });
+    if (typeof d.mp3 === "string" && /^https?:/.test(d.mp3)) downloads.push({ title: "TikTok Audio (MP3)", url: d.mp3 });
+    if (!downloads.length) throw new Error("No downloadable links were found for this TikTok URL.");
+    return {
+      title: typeof payload.title === "string" ? payload.title : "",
+      thumbnail: "",
+      downloads: downloads
+    };
+  }
+
+  function parseInstagram(payload) {
+    var url = "";
+    var filename = "Instagram Video";
+    if (payload && payload.media && typeof payload.media === "object") {
+      if (typeof payload.media.videoUrl === "string" && /^https?:/.test(payload.media.videoUrl)) url = payload.media.videoUrl;
+      if (typeof payload.media.filename === "string" && payload.media.filename) filename = payload.media.filename;
+      if (typeof payload.media.thumbnailUrl === "string") var igThumb = payload.media.thumbnailUrl;
+    }
+    if (!url) {
+      var out = { links: [], thumbs: [] };
+      collectMedia(payload, out, 0);
+      var videoLinks = out.links.filter(function (l) { return /videourl|video|download/.test(l.key); });
+      if (videoLinks.length) url = videoLinks[0].url;
+      else if (out.links.length) url = out.links[0].url;
+    }
+    if (!url) throw new Error("No downloadable links were found for this URL.");
+    var previewUrl = url.replace(/([?&])dl=1&?/, "$1").replace(/[?&]$/, "");
+    return {
+      title: filename,
+      thumbnail: (typeof igThumb === "string" && igThumb) || "",
+      previewUrl: previewUrl,
+      downloads: [{ title: "Instagram Video (MP4)", url: url }]
+    };
+  }
+
+  function parseSoundCloud(payload) {
+    var title = "";
+    if (payload && typeof payload.title === "string") title = payload.title;
+    var audio = payload && typeof payload.audioUrl === "string" && /^https?:/.test(payload.audioUrl) ? payload.audioUrl : "";
+    if (!audio) {
+      var out = { links: [], thumbs: [] };
+      collectMedia(payload, out, 0);
+      var audioLinks = out.links.filter(function (l) { return /audiourl|audio|download|stream/.test(l.key); });
+      if (audioLinks.length) audio = audioLinks[0].url;
+    }
+    if (!audio) throw new Error("No downloadable audio was found for this SoundCloud track. It may be private, restricted, or unavailable for download.");
+    var artwork = payload && typeof payload.artworkUrl === "string" ? payload.artworkUrl : "";
+    return {
+      title: title,
+      thumbnail: artwork,
+      downloads: [{ title: "SoundCloud Audio", url: audio }]
+    };
+  }
+
+  function parseResponse(payload, platform) {
+    var out = { links: [], thumbs: [] };
+    collectMedia(payload, out, 0);
+    if (!out.links.length) throw new Error("No downloadable links were found for this URL.");
+    var seen = {};
+    var ranked = out.links
+      .filter(function (l) { return !seen[l.url] && (seen[l.url] = true); })
+      .map(function (l) { return { l: l, s: scoreLink(l, platform) }; })
+      .sort(function (a, b) { return b.s - a.s; })
+      .map(function (r) { return r.l; });
+    var title = "";
+    if (payload && typeof payload === "object") {
+      title = payload.title || payload.name || (payload.data && payload.data.title) || (payload.results && payload.results.title) || "";
+    }
+    if (payload && payload.results && payload.results[0] && payload.results[0].filename) title = payload.results[0].filename;
+    return {
+      title: typeof title === "string" ? title.trim() : "",
+      thumbnail: out.thumbs[0] || "",
+      downloads: ranked.map(function (l, i) {
+        var label = l.key.replace(/[_-]/g, " ").replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+        if (AUDIO_PLATFORMS.indexOf(platform) !== -1) {
+          if (/audio|mp3/.test(l.key)) label = "Audio (MP3)";
+          else if (/download/.test(l.key)) label = "Download";
+        }
+        return { title: label + (i === 0 ? "" : " · Option " + (i + 1)), url: l.url };
+      })
+    };
+  }
+
+  var urlInput = document.getElementById("videoUrl");
+  var downloadButton = document.getElementById("downloadButton");
+  var pasteButton = document.getElementById("pasteButton");
+  var statusBox = document.getElementById("statusBox");
+  var mediaResult = document.getElementById("mediaResult");
+  var previewVideo = document.getElementById("previewVideo");
+  var previewAudio = document.getElementById("previewAudio");
+  var downloadBtn = document.getElementById("downloadBtn");
+  var downloadBtnLabel = document.getElementById("downloadBtnLabel");
+  var altLinks = document.getElementById("altLinks");
+  var dlList = document.getElementById("dlList");
+  var busy = false;
+
+  var showcaseBox = document.getElementById("showcaseBox");
+  var showcaseVideo = showcaseBox ? showcaseBox.querySelector("video") : null;
+  if (showcaseBox && showcaseVideo) {
+    var startShowcase = function () {
+      var p = showcaseVideo.play();
+      if (p && p.catch) p.catch(function () {});
+    };
+    showcaseVideo.addEventListener("playing", function () {
+      showcaseVideo.classList.add("ready");
+      showcaseBox.classList.add("playing");
+    });
+    showcaseVideo.addEventListener("canplay", startShowcase);
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden && showcaseVideo.paused) startShowcase();
+    });
+    startShowcase();
+  }
+
+  function showStatus(message, type) {
+    statusBox.textContent = message;
+    statusBox.className = "alert show " + type;
+    if (type === "err") mediaResult.classList.remove("show");
+  }
+
+  function clearStatus() {
+    statusBox.textContent = "";
+    statusBox.className = "alert";
+  }
+
+  function validateUrl(value) {
+    if (!value || !value.trim()) return { valid: false, message: "Please paste a video link first." };
+    try {
+      var parsed = new URL(value.trim());
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") throw new Error();
+      return { valid: true, url: parsed.href };
+    } catch (e) {
+      return { valid: false, message: "That doesn't look like a valid link — it should start with http:// or https://" };
+    }
+  }
+
+  function requestMedia(href, platform) {
+    if (platform === "facebook") {
+      return Promise.resolve({
+        title: "Facebook Video",
+        thumbnail: "",
+        downloads: [{ title: "Facebook Video (MP4)", url: buildEndpoint(platform, href) }]
+      });
+    }
+    var endpoint = buildEndpoint(platform, href);
+    var controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+    var timedOut = false;
+    var timer = controller ? setTimeout(function () { timedOut = true; controller.abort(); }, 30000) : null;
+    return fetch(endpoint, { headers: { Accept: "application/json" }, signal: controller ? controller.signal : undefined })
+      .then(function (res) {
+        return res.text().then(function (text) { return { res: res, text: text }; });
+      })
+      .then(function (r) {
+        var payload = null;
+        try { payload = JSON.parse(r.text); } catch (e) {}
+        if (!r.text.trim()) throw new Error("The server returned an empty response.");
+        if (!r.res.ok) throw new Error(getApiError(payload, r.text, r.res.status));
+        if (!payload) throw new Error("The server returned invalid JSON.");
+        if (platform === "tiktok") return parseTikTok(payload);
+        if (platform === "instagram") return parseInstagram(payload);
+        if (platform === "soundcloud") return parseSoundCloud(payload);
+        var okFlag = payload.status === undefined || payload.status === true || payload.status === "ok" || payload.status === "success" || payload.ok === true || payload.code === 0;
+        if (!okFlag) throw new Error(getApiError(payload, r.text, r.res.status));
+        return parseResponse(payload, platform);
+      })
+      .catch(function (error) {
+        if (timedOut) throw new Error("The request took too long (30s timeout). The server may be busy — please try again.");
+        if (error && error.name === "AbortError") throw new Error("The request was cancelled. Please try again.");
+        if (error instanceof TypeError) throw new Error("Could not reach the server. Check your connection and try again.");
+        throw error;
+      })
+      .finally(function () {
+        if (timer) clearTimeout(timer);
+      });
+  }
+
+  function getApiError(payload, responseText, status) {
+    if (payload && typeof payload === "object") {
+      var keys = ["error", "message", "msg", "detail", "reason", "details"];
+      for (var i = 0; i < keys.length; i++) {
+        if (typeof payload[keys[i]] === "string" && payload[keys[i]].trim()) return payload[keys[i]].trim();
+      }
+      if (payload.details && typeof payload.details === "object") {
+        var dkeys = Object.keys(payload.details);
+        for (var j = 0; j < dkeys.length; j++) {
+          var dv = payload.details[dkeys[j]];
+          if (typeof dv === "string" && dv.trim()) return dv.trim();
+        }
+      }
+    }
+    var plain = typeof responseText === "string" ? responseText.replace(/<[^>]*>/g, " ").trim() : "";
+    return plain ? plain.slice(0, 200) : "Server error (HTTP " + status + ").";
+  }
+
+  function isPlayableMedia(url) {
+    return /\.(mp4|webm|mov|m4v|mp3|m4a|aac|m3u8)(\?|#|$)/i.test(url) || /video|audio|stream|download|get\?/i.test(url);
+  }
+
+  function destroyHls(el) {
+    if (el._hls) {
+      try { el._hls.destroy(); } catch (e) {}
+      el._hls = null;
+    }
+  }
+
+  function attachMedia(el, url) {
+    destroyHls(el);
+    if (isHls(url) && window.Hls && Hls.isSupported()) {
+      var hls = new Hls({ enableWorker: true });
+      el._hls = hls;
+      hls.on(Hls.Events.ERROR, function (evt, data) {
+        if (data && data.fatal) showStatus("The preview stream failed to load. You can still try the download buttons.", "err");
+      });
+      hls.loadSource(url);
+      hls.attachMedia(el);
+    } else {
+      el.src = url;
+      el.load();
+    }
+  }
+
+  function fitPreviewBox() {
+    var w = previewVideo.videoWidth, h = previewVideo.videoHeight;
+    if (w > 0 && h > 0) previewVideo.style.aspectRatio = w + " / " + h;
+  }
+  previewVideo.addEventListener("loadedmetadata", fitPreviewBox);
+
+  previewAudio.addEventListener("error", function () {
+    showStatus("The audio preview failed to load. Try the download buttons instead.", "err");
+  });
+  previewVideo.addEventListener("error", function () {
+    showStatus("The video preview failed to load. Try the download buttons instead.", "err");
+  });
+
+  function showResult(item, platform) {
+    var isAudio = AUDIO_PLATFORMS.indexOf(platform) !== -1 || (platform === "tiktok" && /\.mp3($|\?)/i.test(item.downloads[0].url));
+    var best = item.downloads.find(isPlayableMedia) || item.downloads[0];
+
+    previewVideo.pause();
+    previewAudio.pause();
+    previewVideo.style.aspectRatio = "";
+
+    if (isAudio) {
+      previewVideo.style.display = "none";
+      previewAudio.style.display = "block";
+      attachMedia(previewAudio, best.url);
+    } else {
+      previewAudio.style.display = "none";
+      previewVideo.style.display = "block";
+      attachMedia(previewVideo, item.previewUrl || best.url);
+    }
+
+    downloadBtn.href = best.url;
+    downloadBtn.setAttribute("download", "");
+    downloadBtnLabel.textContent = isAudio ? "Download Audio" : "Download Video";
+
+    dlList.innerHTML = "";
+    var others = item.downloads.filter(function (d) { return d.url !== best.url; });
+    if (others.length) {
+      others.forEach(function (d) {
+        var row = document.createElement("div");
+        row.className = "choice";
+        var name = document.createElement("span");
+        name.className = "c-name";
+        name.textContent = d.title;
+        var link = document.createElement("a");
+        link.href = d.url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = "Download";
+        row.appendChild(name);
+        row.appendChild(link);
+        dlList.appendChild(row);
+      });
+      altLinks.classList.remove("hidden");
+    } else {
+      altLinks.classList.add("hidden");
+    }
+
+    mediaResult.classList.add("show");
+  }
+
+  function handleDownload() {
+    if (busy) return;
+    clearStatus();
+    var input = validateUrl(urlInput.value);
+    if (!input.valid) { showStatus(input.message, "err"); urlInput.focus(); return; }
+    var platform = detectPlatform(new URL(input.url));
+    if (!platform) {
+      showStatus("Unsupported platform yet. Try Facebook, TikTok, Instagram, Threads, X, Snapchat, Reddit, YouTube, Twitch, Spotify or SoundCloud.", "err");
+      return;
+    }
+    busy = true;
+    downloadButton.disabled = true;
+    downloadButton.textContent = "Fetching…";
+    showStatus("Looking up your link — this usually takes a few seconds.", "info");
+    requestMedia(input.url, platform)
+      .then(function (item) {
+        showResult(item, platform);
+        showStatus("All set! Preview it, then tap the download button to save it.", "ok");
+      })
+      .catch(function (error) {
+        showStatus(error.message || "Something went wrong. Please try again.", "err");
+      })
+      .finally(function () {
+        busy = false;
+        downloadButton.disabled = false;
+        downloadButton.textContent = "Get download links";
+      });
+  }
+
+  function pasteFromClipboard() {
+    if (navigator.clipboard && navigator.clipboard.readText) {
+      navigator.clipboard.readText().then(function (text) {
+        urlInput.value = (text || "").trim();
+        urlInput.focus();
+      }).catch(function () { urlInput.focus(); });
+    } else {
+      urlInput.focus();
+    }
+  }
+
+  downloadButton.addEventListener("click", handleDownload);
+  pasteButton.addEventListener("click", pasteFromClipboard);
+  urlInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") { e.preventDefault(); handleDownload(); }
+  });
+  urlInput.addEventListener("input", function () {
+    if (statusBox.classList.contains("err")) clearStatus();
+  });
+
+  document.querySelectorAll(".faq-q").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var item = btn.parentElement;
+      var wasOpen = item.classList.contains("open");
+      document.querySelectorAll(".faq-item.open").forEach(function (el) { el.classList.remove("open"); });
+      if (!wasOpen) item.classList.add("open");
+    });
+  });
 </script>
 
 </body>
